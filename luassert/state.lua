@@ -1,3 +1,5 @@
+local _M, crequire, brequire = require("newmodule")(...)
+
 -- maintains a state of the assert engine in a linked-list fashion
 -- records; formatters, parameters, spies and stubs
 
@@ -12,7 +14,7 @@ local nilvalue = {} -- unique ID to refer to nil values for parameters
 local current
 
 -- exported module table
-local state = {}
+local state = _M
 
 ------------------------------------------------------
 -- Reverts to a (specific) snapshot.

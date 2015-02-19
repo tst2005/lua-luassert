@@ -1,5 +1,7 @@
+local _M = require("newmodule")(...)
+
 -- module will not return anything, only register formatters with the main assert engine
-local assert = require('luassert.assert')
+--local assert = require('luassert.assert')
 
 local function fmt_string(arg)
   if type(arg) == "string" then
@@ -126,13 +128,17 @@ local function fmt_thread(arg)
   end
 end
 
-assert:add_formatter(fmt_string)
-assert:add_formatter(fmt_number)
-assert:add_formatter(fmt_boolean)
-assert:add_formatter(fmt_nil)
-assert:add_formatter(fmt_table)
-assert:add_formatter(fmt_function)
-assert:add_formatter(fmt_userdata)
-assert:add_formatter(fmt_thread)
--- Set default table display depth for table formatter
-assert:set_parameter("TableFormatLevel", 3)
+function _M.register(assert)
+	assert:add_formatter(fmt_string)
+	assert:add_formatter(fmt_number)
+	assert:add_formatter(fmt_boolean)
+	assert:add_formatter(fmt_nil)
+	assert:add_formatter(fmt_table)
+	assert:add_formatter(fmt_function)
+	assert:add_formatter(fmt_userdata)
+	assert:add_formatter(fmt_thread)
+	-- Set default table display depth for table formatter
+	assert:set_parameter("TableFormatLevel", 3)
+end
+
+return _M

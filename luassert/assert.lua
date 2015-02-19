@@ -1,5 +1,8 @@
 local s = require 'say'
-local astate = require 'luassert.state'
+
+local _M, crequire, brequire = require("newmodule")(...)
+
+local astate = brequire 'state'
 local obj   -- the returned module table
 
 -- list of namespaces
@@ -169,5 +172,7 @@ local __meta = {
   end,
 
 }
+
+require("newmodule"):from(obj, ...)
 
 return setmetatable(obj, __meta)

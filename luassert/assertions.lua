@@ -1,13 +1,17 @@
 -- module will not return anything, only register assertions with the main assert engine
 
+-- EDIT: this module return a table with register function.
+local _M, crequire, brequire = require("newmodule")(...)
+
 -- assertions take 2 parameters;
 -- 1) state
 -- 2) arguments list. The list has a member 'n' with the argument count to check for trailing nils
 -- returns; boolean; whether assertion passed
 
-local assert = require('luassert.assert')
-local util = require ('luassert.util')
-local s = require('say')
+
+--local assert = brequire('assert') -- require('luassert.assert')
+local util = brequire('util') -- require ('luassert.util')
+local say = require('say')
 
 local function unique(state, arguments)
   local list = arguments[1]
@@ -30,7 +34,7 @@ end
 
 local function equals(state, arguments)
   local argcnt = arguments.n
-  assert(argcnt > 1, s("assertion.internal.argtolittle", { "equals", 2, tostring(argcnt) }))
+  assert(argcnt > 1, say("assertion.internal.argtolittle", { "equals", 2, tostring(argcnt) }))
   for i = 2,argcnt  do
     if arguments[1] ~= arguments[i] then
       -- switch arguments for proper output message
@@ -44,7 +48,7 @@ end
 
 local function same(state, arguments)
   local argcnt = arguments.n
-  assert(argcnt > 1, s("assertion.internal.argtolittle", { "same", 2, tostring(argcnt) }))
+  assert(argcnt > 1, say("assertion.internal.argtolittle", { "same", 2, tostring(argcnt) }))
   local prev = nil
   for i = 2,argcnt  do
     if type(arguments[1]) == 'table' and type(arguments[i]) == 'table' then
@@ -77,7 +81,7 @@ end
 local function has_error(state, arguments)
   local func = arguments[1]
   local err_expected = arguments[2]
-  assert(util.callable(func), s("assertion.internal.badargtype", { "error", "function, or callable object", type(func) }))
+  assert(util.callable(func), say("assertion.internal.badargtype", { "error", "function, or callable object", type(func) }))
   local ok, err_actual = pcall(func)
   arguments.nofmt = {}
   arguments.n = 2
@@ -145,23 +149,27 @@ local function is_userdata(state, arguments) return is_type(state, arguments, "u
 local function is_function(state, arguments) return is_type(state, arguments, "function") end
 local function is_thread(state, arguments)   return is_type(state, arguments, "thread")   end
 
-assert:register("assertion", "true", is_true, "assertion.same.positive", "assertion.same.negative")
-assert:register("assertion", "false", is_false, "assertion.same.positive", "assertion.same.negative")
-assert:register("assertion", "boolean", is_boolean, "assertion.same.positive", "assertion.same.negative")
-assert:register("assertion", "number", is_number, "assertion.same.positive", "assertion.same.negative")
-assert:register("assertion", "string", is_string, "assertion.same.positive", "assertion.same.negative")
-assert:register("assertion", "table", is_table, "assertion.same.positive", "assertion.same.negative")
-assert:register("assertion", "nil", is_nil, "assertion.same.positive", "assertion.same.negative")
-assert:register("assertion", "userdata", is_userdata, "assertion.same.positive", "assertion.same.negative")
-assert:register("assertion", "function", is_function, "assertion.same.positive", "assertion.same.negative")
-assert:register("assertion", "thread", is_thread, "assertion.same.positive", "assertion.same.negative")
-assert:register("assertion", "returned_arguments", returned_arguments, "assertion.returned_arguments.positive", "assertion.returned_arguments.negative")
+function _M.register(assert)
+	assert:register("assertion", "true", is_true, "assertion.same.positive", "assertion.same.negative")
+	assert:register("assertion", "false", is_false, "assertion.same.positive", "assertion.same.negative")
+	assert:register("assertion", "boolean", is_boolean, "assertion.same.positive", "assertion.same.negative")
+	assert:register("assertion", "number", is_number, "assertion.same.positive", "assertion.same.negative")
+	assert:register("assertion", "string", is_string, "assertion.same.positive", "assertion.same.negative")
+	assert:register("assertion", "table", is_table, "assertion.same.positive", "assertion.same.negative")
+	assert:register("assertion", "nil", is_nil, "assertion.same.positive", "assertion.same.negative")
+	assert:register("assertion", "userdata", is_userdata, "assertion.same.positive", "assertion.same.negative")
+	assert:register("assertion", "function", is_function, "assertion.same.positive", "assertion.same.negative")
+	assert:register("assertion", "thread", is_thread, "assertion.same.positive", "assertion.same.negative")
+	assert:register("assertion", "returned_arguments", returned_arguments, "assertion.returned_arguments.positive", "assertion.returned_arguments.negative")
 
-assert:register("assertion", "same", same, "assertion.same.positive", "assertion.same.negative")
-assert:register("assertion", "equals", equals, "assertion.equals.positive", "assertion.equals.negative")
-assert:register("assertion", "equal", equals, "assertion.equals.positive", "assertion.equals.negative")
-assert:register("assertion", "unique", unique, "assertion.unique.positive", "assertion.unique.negative")
-assert:register("assertion", "error", has_error, "assertion.error.positive", "assertion.error.negative")
-assert:register("assertion", "errors", has_error, "assertion.error.positive", "assertion.error.negative")
-assert:register("assertion", "truthy", truthy, "assertion.truthy.positive", "assertion.truthy.negative")
-assert:register("assertion", "falsy", falsy, "assertion.falsy.positive", "assertion.falsy.negative")
+	assert:register("assertion", "same", same, "assertion.same.positive", "assertion.same.negative")
+	assert:register("assertion", "equals", equals, "assertion.equals.positive", "assertion.equals.negative")
+	assert:register("assertion", "equal", equals, "assertion.equals.positive", "assertion.equals.negative")
+	assert:register("assertion", "unique", unique, "assertion.unique.positive", "assertion.unique.negative")
+	assert:register("assertion", "error", has_error, "assertion.error.positive", "assertion.error.negative")
+	assert:register("assertion", "errors", has_error, "assertion.error.positive", "assertion.error.negative")
+	assert:register("assertion", "truthy", truthy, "assertion.truthy.positive", "assertion.truthy.negative")
+	assert:register("assertion", "falsy", falsy, "assertion.falsy.positive", "assertion.falsy.negative")
+end
+
+return _M
